@@ -57,7 +57,7 @@ jobs:
         with:
           host: ${{ vars.SERVER_HOST }}
           username: ${{ vars.SERVER_USER }}
-          key: ${{ vars.SSH_PRIVATE_KEY }}
+          password: ${{ vars.SSH_PASSWORD }}
           script: |
             image_tag=${{ github.ref == 'refs/heads/main' ? 'main' : 'dev' }}
             current_container=$(docker ps --filter "ancestor=${{ vars.DOCKERHUB_USERNAME }}/${{ vars.PROJECT_NAME }}:$image_tag" --format "{{.Names}}")
