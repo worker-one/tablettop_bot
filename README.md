@@ -1,14 +1,14 @@
-## Telegram Bot Template
+## Tablettop Telegram Bot
 
-This is a simple template for creating a Telegram bot using Python. It uses the `pyTelegramBotAPI` library for interaction with Telegram's API and SQLAlchemy for database interactions. The bot logs messages, saves user details, and can be deployed using Docker.
+A Telegram bot for Tablettop application. The project uses the `pyTelegramBotAPI` library for interaction with Telegram's API and SQLAlchemy for database interactions.
 
 ## Structure
 
-The project is structured as follows:
+The project is structured in `src/tablettop_bot/` as following:
 
-`main.py` - The main file that defines and runs the bot.
+`main.py` - The main file that connects (creates and initializes if neede) to database, defines and runs the bot.
 
-`core/` - The module that contains services for the bot's applications.
+`core/` - The module that contains core services for the bot's applications.
 
 `conf/config.yaml` - The base configuration for the bot: name, version, timezone, applications enabled, database settings, etc.
 
@@ -24,11 +24,11 @@ The project is structured as follows:
 
 `db/models.py` - Models for database tables.
 
-`db/crud.py` - CRUD operations for database.
+`db/crud/` - CRUD operations for database.
 
 `tests/` - The directory that contains the tests for the application.
 
-`Dockerfile` - The file that defines the Docker container for this application.
+`Dockerfile` - The file that defines the Docker container for this project.
 
 ## In-built admin applications
 
@@ -42,36 +42,32 @@ The project is structured as follows:
 
 ## In-built user applications
 
-### LLM
+### Host Game
 
-Sending queries to LLM.
+Host a game.
 
-### Google Drive
+### Join Game
 
-Upload and download file on Google Drive.
+Join to a game, manage the existing subscribtions to games.
 
-### Google Sheets
+### Library
 
-Wrtie records to Google Sheets.
+Read games in the library
 
-### Resource
+### About
 
-Creating and downloading a csv file.
-
-### Language
-
-Change the language.
+Information about the bot.
 
 ## Setup
 
 1. Clone this repository.
 2. Create a `.env` file in the root directory and add your database connection string and bot token.
 3. Install the dependencies with `pip install .`.
-4. Run the bot with `python src/telegrab_bot/main.py`.
+4. Run the bot with `python src/tablettop_bot/main.py`.
 
 ## Docker
 
 To run this application in a Docker container, follow these steps:
 
-1. Build the Docker image with `docker build -t telegram-bot .`.
-2. Run the Docker container with `docker run -p 80:80 telegram-bot`.
+1. Build the Docker image with `docker build -t tablettop-bot .`.
+2. Run the Docker container with `docker run -p 80:80 tablettop-bot`.

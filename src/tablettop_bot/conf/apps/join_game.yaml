@@ -1,0 +1,51 @@
+app:
+  room_to_link:
+    '1': 'https://discord.com/channels/1220867723601641525/1220867724582846589'
+    '2': 'https://discord.com/channels/1220867723601641525/1233917513780428930'
+    '3': 'https://discord.com/channels/1220867723601641525/1229882138850099272'
+    '4': 'https://discord.com/channels/1220867723601641525/1220867724582846590'
+    '5': 'https://discord.com/channels/1220867723601641525/1220871645514825870'
+    '6': 'https://discord.com/channels/1220867723601641525/1220871009645760563'
+    '7': 'https://discord.com/channels/1220867723601641525/1220871168077205625'
+    '8': 'https://discord.com/channels/1220867723601641525/1220871441105555523'
+    '9': 'https://discord.com/channels/1220867723601641525/1220871758719094795'
+    '10': 'https://discord.com/channels/1220867723601641525/1221484888734302270'
+    '11': 'https://discord.com/channels/1220867723601641525/1246906414056865933'
+    '12': 'https://discord.com/channels/1220867723601641525/1247977957511659561'
+    '13': 'https://discord.com/channels/1220867723601641525/1247978546291413154'
+    '14': 'https://discord.com/channels/1220867723601641525/1247979068368883814'
+    '15': 'https://discord.com/channels/1220867723601641525/1247979171137716224'
+    '16': 'https://discord.com/channels/1220867723601641525/1247979210367041666'
+    '17': 'https://discord.com/channels/1220867723601641525/1247979267791523993'
+    '18': 'https://discord.com/channels/1220867723601641525/1247979317661536296'
+    '19': 'https://discord.com/channels/1220867723601641525/1247979354307297300'
+    '20': 'https://discord.com/channels/1220867723601641525/1247979388239089755'
+
+strings:
+  no_scheduled_games: "На данный момент нет запланированных игр."
+  game_info_steam_template: |
+    Вы успешно записаны на игру: {game_name}
+
+    Дата проведения: {formatted_date_ru} ({day_of_week})
+    Время: {formatted_time} (UTC+3 MSK)
+    <a href="{room_link}">Ссылка на комнату #{room} в Discord</a>
+    Сервер в Tabletop Simulator: {server_data}
+    Пароль от сервера: {server_password}
+
+    Ведущий: @{initiator_nickname}
+  game_info_template: |
+    Вы успешно записаны на игру: {game_name}
+
+    Дата проведения: {formatted_date_ru} ({day_of_week})
+    Время: {formatted_time} (UTC+3 MSK)
+    <a href="{room_link}">Ссылка на комнату #{room} в Discord</a>
+
+    Ведущий: @{initiator_nickname}
+  day_name_mapping:
+      'Monday': 'Понедельник',
+      'Tuesday': 'Вторник',
+      'Wednesday': 'Среда',
+      'Thursday': 'Четверг',
+      'Friday': 'Пятница',
+      'Saturday': 'Суббота',
+      'Sunday': 'Воскресенье'

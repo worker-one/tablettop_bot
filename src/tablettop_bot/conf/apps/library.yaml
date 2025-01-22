@@ -1,0 +1,8 @@
+strings:
+  library_list: "Библиотека игр:"
+  library_empty: "Библиотека игр пуста."
+  online_library_list: "Онлайн библиотека игр:"
+  online_library_empty: "Онлайн библиотека игр пуста."
+  prev_page: "⬅️ Предыдущая страница"
+  next_page: "➡️ Следующая страница"
+  game_not_found: "Информация об игре не найдена."

@@ -1,4 +1,4 @@
-from src.telegram_bot.core.app import App
+from tablettop_bot.src.tablettop_bot.core.games import App
 
 
 def test_app_run():
