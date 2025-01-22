@@ -51,22 +51,20 @@ jobs:
     steps:
       - name: logging
         run: |
-          echo ${{ vars.SERVER_HOST }}
+          echo ${{ secrets.SERVER_HOST }}
       - name: SSH into server and pull image
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ vars.SERVER_HOST }}
-          username: ${{ vars.SERVER_USER }}
-          password: ${{ vars.SSH_PASSWORD }}
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            image_tag=${{ github.ref == 'refs/heads/main' && 'main' || 'dev' }}
-            current_container=$(docker ps --filter "ancestor=${{ vars.DOCKERHUB_USERNAME }}/${{ vars.PROJECT_NAME }}:$image_tag" --format "{{.Names}}")
+            image_tag=${{ github.ref == 'refs/heads/main' ? 'main' : 'dev' }}
+            current_container=$(docker ps --filter "ancestor=${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}:$image_tag" --format "{{.Names}}")
             if [ -n "$current_container" ]; then
               docker stop $current_container
               docker rm $current_container
             fi
-            docker pull ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.PROJECT_NAME }}:$image_tag
-            docker stop current_container || true
-            docker rm current_container || true
-            docker images -a | grep none | awk '{ print $3; }' | xargs docker rmi --force
-            docker run -d --name current_container -p ${{ vars.HOST_PORT }}:${{ vars.HOST_PORT }} ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.PROJECT_NAME }}:$image_tag
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}:$image_tag
+            docker image prune -f
+            docker run -d --name "${{ secrets.PROJECT_NAME }}_container" -p ${{ secrets.HOST_PORT }}:${{ secrets.HOST_PORT }} ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}:$image_tag
