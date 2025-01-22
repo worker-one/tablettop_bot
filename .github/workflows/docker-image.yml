@@ -59,12 +59,12 @@ jobs:
           username: ${{ vars.SERVER_USER }}
           password: ${{ vars.SSH_PASSWORD }}
           script: |
-            image_tag=${{ github.ref == 'refs/heads/main' ? 'main' : 'dev' }}
-            current_container=$(docker ps --filter "ancestor=${{ vars.DOCKERHUB_USERNAME }}/${{ vars.PROJECT_NAME }}:$image_tag" --format "{{.Names}}")
+            image_tag=main
+            current_container=$(docker ps --filter "ancestor=${{ vars.DOCKERHUB_USERNAME }}/${{ vars.PROJECT_NAME }}:main" --format "{{.Names}}")
             if [ -n "$current_container" ]; then
               docker stop $current_container
               docker rm $current_container
             fi
-            docker pull ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.PROJECT_NAME }}:$image_tag
+            docker pull ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.PROJECT_NAME }}:main
             docker image prune -f
-            docker run -d --name "${{ vars.PROJECT_NAME }}_container" -p ${{ vars.HOST_PORT }}:${{ vars.HOST_PORT }} ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.PROJECT_NAME }}:$image_tag
+            docker run -d --name "${{ vars.PROJECT_NAME }}_container" -p ${{ vars.HOST_PORT }}:${{ vars.HOST_PORT }} ${{ vars.DOCKERHUB_USERNAME }}/${{ vars.PROJECT_NAME }}:main
