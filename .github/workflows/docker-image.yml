@@ -21,6 +21,9 @@ jobs:
           elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
             echo "BOT_TOKEN=${{ vars.BOT_TOKEN_DEV }}" >> .env
           fi
+
+          echo "ADMIN_USER_ID=${{ vars.ADMIN_USER_ID }}" >> .env
+          echo "ADMIN_USERNAME=${{ vars.ADMIN_USERNAME }}" >> .env
           
           echo "DB_HOST=${{ vars.DB_HOST }}" >> .env
           echo "DB_PORT=${{ vars.DB_PORT }}" >> .env
