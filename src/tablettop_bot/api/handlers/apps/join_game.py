@@ -64,22 +64,23 @@ def format_enrolled_games(enrolled_games, chat_id, user_id):
         if enrolled_users_message:
             formatted_message += f'{enrolled_users_message}\n'
 
+        print(f"room = {game.room}")
+
         # Add server or room information
         if game.use_steam:
             formatted_message += f'Server: {game.server_data}, Password: {game.server_password}\n'
         if game.room:
-            room_link = config.app.room_to_link.get(str(game.room))
+            room_link = config.app.room_to_link.get(game.room)
             if room_link:
-                formatted_message += f'Discord комната: <a href="{room_link}">#{game.discord_telegram_link}</a>\n'
+                formatted_message += f'Discord комната: <a href="{room_link}">#{game.room}</a>\n'
             else:
-                formatted_message += f'Discord комната: #{game.discord_telegram_link}\n\n'
+                formatted_message += f'Discord комната: {game.discord_telegram_link}\n\n'
 
     keyboard = InlineKeyboardMarkup()
     keyboard.add(InlineKeyboardButton("Отписаться от игры", callback_data='select_unsubscribe_game'))
     keyboard.add(InlineKeyboardButton("Удалить игру", callback_data='select_delete_game'))
 
     return formatted_message, keyboard
-
 
 
 class GameState:
@@ -143,12 +144,13 @@ def register_handlers(bot: TeleBot):
 
     logger.info("Registering `join_game` handlers")
 
-    @bot.message_handler(commands=['join_game','start'])
+    @bot.message_handler(commands=['join_game', 'start'])
     def handle_start(message):
         cleanup_past_games()
         crud.prolong()
 
         scheduled_games = crud.get_scheduled_games()
+        print(f"scheduled_games = {len(scheduled_games)}")
         if scheduled_games:
             formatted_message = format_scheduled_games(bot, scheduled_games, message.chat.id)
             keyboard = InlineKeyboardMarkup()
@@ -192,24 +194,23 @@ def register_handlers(bot: TeleBot):
             keyboard.add(InlineKeyboardButton("Вперед", callback_data=f'enroll_page_{page + 1}'))
         keyboard.add(InlineKeyboardButton("Назад", callback_data='back_to_main'))
 
-        new_text = 'Пожалуйста, выберите игру, к которой хотите присоединиться'
         if message_id:
             bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id,
-                text=new_text,
+                text=app_strings.choose_game_to_join,
                 reply_markup=keyboard
             )
         else:
             bot.send_message(
                 chat_id=chat_id,
-                text=new_text,
+                text=app_strings.choose_game_to_join,
                 reply_markup=keyboard
             )
 
     @bot.message_handler(commands=['create_game'])
     def create_game_command(message):
-        msg = bot.send_message(message.chat.id, "Введите название игры:")
+        msg = bot.send_message(message.chat.id, app_strings.enter_game_name)
         bot.register_next_step_handler(msg, process_game_name)
 
     @bot.callback_query_handler(func=lambda call: call.data.startswith('date_'))
@@ -499,7 +500,7 @@ def register_handlers(bot: TeleBot):
                 bot.answer_callback_query(call.id, "Игра успешно удалена.")
                 bot.send_message(call.message.chat.id, "Вы успешно удалили игру.")
         else:
-            bot.answer_callback_query(call.id, "Вы не являетесь организатором этой игры.", show_alert=True)
+            bot.answer_callback_query(call.id, app_strings.not_initiator, show_alert=True)
 
 
     @bot.callback_query_handler(
@@ -604,4 +605,4 @@ def register_handlers(bot: TeleBot):
 
         except Exception as e:
             print(f"Error in handle_callback: {e}")
-            bot.send_message(chat_id, "Произошла ошибка при обработке запроса. Пожалуйста, попробуйте еще раз.")
+            bot.send_message(chat_id, app_strings.error)

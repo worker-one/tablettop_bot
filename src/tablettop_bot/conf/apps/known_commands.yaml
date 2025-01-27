@@ -1,0 +1,11 @@
+app:
+  commands:
+    - host_game
+    - join_game
+    - library
+    - about
+    - start
+    - online_library
+    - create_game
+strings:
+  message: "Извините, я не понимаю эту команду или сообщение. Пожалуйста, используйте одну из доступных команд."

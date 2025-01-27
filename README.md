@@ -42,6 +42,10 @@ The project is structured in `src/tablettop_bot/` as following:
 
 ## In-built user applications
 
+### Known Commands
+
+Notify the user that an entered command is not supported.
+
 ### Host Game
 
 Host a game.

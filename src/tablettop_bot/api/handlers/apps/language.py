@@ -4,7 +4,7 @@ from omegaconf import OmegaConf
 from telebot import TeleBot
 from telebot.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
-from tablettop_bot.db import crud
+from ....db import crud
 
 # Load logging configuration with OmegaConf
 logging.basicConfig(level=logging.INFO)

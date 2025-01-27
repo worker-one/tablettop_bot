@@ -1,16 +1,16 @@
 name: "tablettop_bot"
-version: "0.1.0"
+version: "0.1.1"
 lang: "en"
 timezone: "Europe/Paris"
 antiflood:
   enabled: true
   time_window_seconds: 2
 apps:
-  - start
   - host_game
   - join_game
   - library
   - about
+  - known_commands
 db:
   name: "tablettop_bot"
   tables:
