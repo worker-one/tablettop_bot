@@ -1,5 +1,5 @@
 name: "tablettop_bot"
-version: "0.1.0"
+version: "0.1.1"
 lang: "en"
 timezone: "Europe/Paris"
 antiflood:
@@ -11,6 +11,7 @@ apps:
   - join_game
   - library
   - about
+  - known_commands
 db:
   name: "tablettop_bot"
   tables:

@@ -5,8 +5,8 @@ from omegaconf import OmegaConf
 from telebot import TeleBot
 from telebot.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
-from tablettop_bot.core.games import generate_summary
-from tablettop_bot.db import crud
+from ....core.games import generate_summary
+from ....db import crud
 
 # Load logging configuration with OmegaConf
 logging.basicConfig(level=logging.INFO)
@@ -33,8 +33,8 @@ class GameState:
         self.description = None
         self.link = None
 
+
 def get_game_info_message(game_id):
-    
     
     game_info = crud.get_game_details(game_id)
 
@@ -52,7 +52,7 @@ def get_game_info_message(game_id):
         
         return game_message
     else:
-        return "Информация об игре не найдена."
+        return app_strings.no_game_info
     
 def format_date_with_day_of_week(date):
     
@@ -100,7 +100,7 @@ def register_handlers(bot: TeleBot):
         games = crud.get_all_games()
 
         if not games:
-            bot.send_message(chat_id, 'Библиотека игр пуста.')
+            bot.send_message(chat_id, app_strings.library_empty)
             return
 
         items_per_page = 11
@@ -116,9 +116,9 @@ def register_handlers(bot: TeleBot):
 
         navigation_buttons = []
         if page > 0:
-            navigation_buttons.append(InlineKeyboardButton('⬅️ Предыдущая страница', callback_data=f'prev_page_{page - 1}'))
+            navigation_buttons.append(InlineKeyboardButton(app_strings.prev_page, callback_data=f'prev_page_{page - 1}'))
         if page < total_pages - 1:
-            navigation_buttons.append(InlineKeyboardButton('➡️ Следующая страница', callback_data=f'next_page_{page + 1}'))
+            navigation_buttons.append(InlineKeyboardButton(app_strings.next_page, callback_data=f'next_page_{page + 1}'))
         if navigation_buttons:
             keyboard.row(*navigation_buttons)
 
@@ -145,7 +145,7 @@ def register_handlers(bot: TeleBot):
 
         if game:
             selected_game_id = game_number
-            bot.send_message(call.message.chat.id, "Выберите дату игры:", reply_markup=create_date_buttons())
+            bot.send_message(call.message.chat.id, app_strings.choose_game, reply_markup=create_date_buttons())
         else:
             bot.send_message(call.message.chat.id, app_strings.game_not_found)
 
@@ -156,10 +156,13 @@ def register_handlers(bot: TeleBot):
         
         game_state.selected_date = call.data.split('_')[1]
         formatted_date = format_date_with_day_of_week(datetime.strptime(game_state.selected_date, '%Y-%m-%d'))
-        msg = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"Выберите время игры на {formatted_date}:")
+        msg = bot.edit_message_text(
+            chat_id=call.message.chat.id, message_id=call.message.message_id,
+            text=f"Выберите время игры на {formatted_date}:"
+        )
         bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
         time_keyboard = create_time_buttons()
-        bot.send_message(call.message.chat.id, "Выберите время игры:", reply_markup=time_keyboard)
+        bot.send_message(call.message.chat.id, app_strings.choose_game_time, reply_markup=time_keyboard)
 
     def create_time_buttons():
         
@@ -182,10 +185,13 @@ def register_handlers(bot: TeleBot):
 
         now = datetime.now()
         if selected_datetime < now - timedelta(minutes=30):
-            bot.send_message(call.message.chat.id, "Неправильное время. Пожалуйста, выберите время.")
-            bot.send_message(call.message.chat.id, "Выберите время игры:", reply_markup=create_time_buttons())
+            bot.send_message(call.message.chat.id, app_strings.time_not_valid)
+            bot.send_message(call.message.chat.id, app_strings.choose_game_time, reply_markup=create_time_buttons())
         else:
-            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Нужен ли Steam?", reply_markup=create_steam_keyboard())
+            bot.edit_message_text(
+                chat_id=call.message.chat.id, message_id=call.message.message_id,
+                text=app_strings.steam, reply_markup=create_steam_keyboard()
+            )
 
     
     @bot.callback_query_handler(func=lambda call: call.data.startswith('steam_'))
@@ -199,8 +205,9 @@ def register_handlers(bot: TeleBot):
             now = datetime.now()
             
             if selected_datetime < now - timedelta(minutes=30):
-                bot.send_message(call.message.chat.id, "Неправильное время. Пожалуйста, выберите время в будущем.")
-                bot.send_message(call.message.chat.id, "Выберите время игры:", reply_markup=create_time_buttons())
+                bot.send_message(call.message.chat.id, app_strings.time_not_valid)
+                bot.send_message(call.message.chat.id, app_strings.choose_game_time,
+                reply_markup=create_time_buttons())
                 return
 
             room = crud.get_available_room(selected_datetime)
@@ -214,16 +221,16 @@ def register_handlers(bot: TeleBot):
                 elif call.data == 'steam_no':
                     ask_for_link(call.message)
             else:
-                bot.send_message(call.message.chat.id, "Извините, все комнаты в Discord заняты.")
+                bot.send_message(call.message.chat.id, app_strings.no_room_discord)
         else:
-            bot.send_message(call.message.chat.id, "Ошибка: Неверные данные для выбора Steam.")
+            bot.send_message(call.message.chat.id, app_strings.steam_error)
 
 
     def ask_for_server(message):
         global game_state
         game_state.selected_server = message.text  # Store the entered server information
 
-        bot.send_message(message.chat.id, "Введите пароль для сервера:")
+        bot.send_message(message.chat.id, app_strings.enter_password)
         bot.register_next_step_handler(message, handle_password_input)
 
 
@@ -242,7 +249,7 @@ def register_handlers(bot: TeleBot):
         no_button = InlineKeyboardButton(text="Нет", callback_data='repeat_no')
         markup.add(yes_button, no_button)
 
-        bot.send_message(message.chat.id, "Хотите ли вы повторить игру каждую неделю?", reply_markup=markup)
+        bot.send_message(message.chat.id, app_strings.repeat_game, reply_markup=markup)
 
         
     @bot.callback_query_handler(func=lambda call: call.data in ['repeat_yes', 'repeat_no'])
@@ -263,7 +270,7 @@ def register_handlers(bot: TeleBot):
         
         if selected_datetime < now:
             bot.send_message(message.chat.id, app_strings.invalid_time)
-            bot.send_message(message.chat.id, "Выберите время игры:", reply_markup=create_time_buttons())
+            bot.send_message(message.chat.id, app_strings.choose_game_time, reply_markup=create_time_buttons())
             return
 
         try:
@@ -283,10 +290,11 @@ def register_handlers(bot: TeleBot):
         room = game_state.room
         link = config.app.room_to_link.get(str(room))
 
+        print(f"room={room}")
         
         crud.schedule_game(selected_game_id, selected_datetime, initiator_id=message.chat.id, nickname=username,
                     use_steam=bool(game_state.server_password), server_password=game_state.server_password,
-                    serverdata=game_state.selected_server, discord_telegram_link=None, room=room,repeat_weekly=game_state.repeat_game)
+                    serverdata=game_state.selected_server, discord_telegram_link=link, room=room,repeat_weekly=game_state.repeat_game)
         
         summary = generate_summary(selected_game_id, selected_datetime, serverdata=game_state.selected_server,
                                 server_password=game_state.server_password, use_steam=bool(game_state.server_password),
@@ -307,8 +315,8 @@ def register_handlers(bot: TeleBot):
         now = datetime.now()
         
         if selected_datetime < now - timedelta(minutes=30):
-            bot.send_message(message.chat.id, "Неправильное время. Пожалуйста, выберите время в будущем.")
-            bot.send_message(message.chat.id, "Выберите время игры:", reply_markup=create_time_buttons())
+            bot.send_message(message.chat.id, app_strings.time_not_valid)
+            bot.send_message(message.chat.id, app_strings.choose_game_time, reply_markup=create_time_buttons())
             return
 
         password = message.text
@@ -321,9 +329,10 @@ def register_handlers(bot: TeleBot):
             username = 'Unknown User'
         flagusername= True
         if username is None:
-            username = message.chat.first_name + " " +message.chat.last_name
+            username = message.chat.first_name + " " + message.chat.last_name
             flagusername =False
         room = game_state.room
+        print(f"room={room}")
         link = config.app.room_to_link.get(str(room))
         crud.schedule_game(selected_game_id, selected_datetime, initiator_id=message.from_user.id, nickname=username, use_steam=True, server_password=password, serverdata=game_state.selected_server, room=game_state.room,repeat_weekly=game_state.repeat_game)
         summary = generate_summary(selected_game_id, selected_datetime, serverdata=game_state.selected_server, ini_id=username,server_password=password, use_steam=True,discord_telegram_link=link,room=room,flag = flagusername,repeat = game_state.repeat_game)
