@@ -129,32 +129,44 @@ def prolong():
         game_datetime = datetime.combine(game.date, game.time)
         next_game_datetime = game_datetime + timedelta(days=7)
 
-        if today <= next_game_datetime < today + timedelta(days=21):
-            db: Session = get_session()
-            new_room = get_available_room(next_game_datetime)
-            if new_room:
-                new_scheduled_game = ScheduledGame(
-                    game_id=game.game_id,
-                    date=next_game_datetime.date(),
-                    time=next_game_datetime.time(),
-                    datetime=next_game_datetime,
-                    initiator_id=game.initiator_id,
-                    initiator_name=game.initiator_name,
-                    use_steam=game.use_steam,
-                    server_data=game.server_data,
-                    server_password=game.server_password,
-                    discord_telegram_link=game.discord_telegram_link,
-                    player_ids=game.player_ids,
-                    player_nicknames=game.player_nicknames,
-                    room=new_room,
-                    repweekly=game.repweekly,
-                    PGID=game.id,
-                    GameTree=game.GameTree,
-                    skipped=False
-                )
-                db.add(new_scheduled_game)
-                db.commit()
-                update_gametree(game.id, new_scheduled_game.id)
+        # Check if there's already a child game created for the next week, including skipped ones
+        child_game = db.query(ScheduledGame).filter(
+            ScheduledGame.PGID == game.id,
+            ScheduledGame.date == next_game_datetime.date(),
+            ScheduledGame.time == next_game_datetime.time()
+        ).first()
+
+        synchronize_series_players(game.id)
+
+        if not child_game:
+            if today <= next_game_datetime < today + timedelta(days=21):
+                new_room = get_available_room(next_game_datetime)
+                if new_room:
+                    new_scheduled_game = ScheduledGame(
+                        game_id=game.game_id,
+                        date=next_game_datetime.date(),
+                        time=next_game_datetime.time(),
+                        datetime=next_game_datetime,
+                        initiator_id=game.initiator_id,
+                        initiator_name=game.initiator_name,
+                        use_steam=game.use_steam,
+                        server_data=game.server_data,
+                        server_password=game.server_password,
+                        discord_telegram_link=game.discord_telegram_link,
+                        player_ids=game.player_ids,
+                        player_nicknames=game.player_nicknames,
+                        room=new_room,
+                        repweekly=game.repweekly,
+                        PGID=game.id,
+                        GameTree=game.GameTree,
+                        skipped=False
+                    )
+                    db.add(new_scheduled_game)
+                    db.commit()
+                    update_gametree(game.id, new_scheduled_game.id)
+
+                    # Synchronize players across the entire series
+                    synchronize_series_players(game.id)
 
 def update_gametree(parent_game_id: int, new_game_id: int = None):
     db: Session = get_session()
@@ -232,7 +244,10 @@ def synchronize_series_players(game_id: int):
         if g:
             player_ids = g.player_ids.split(',') if g.player_ids else []
             player_nicknames = g.player_nicknames.split(',') if g.player_nicknames else []
-            all_players.extend(zip(player_ids, player_nicknames))
+            print(f"all_players: {all_players}")
+            for player_id, player_nickname in zip(player_ids, player_nicknames):
+                if (player_id, player_nickname) not in all_players:
+                    all_players.append((player_id, player_nickname))
 
     all_player_ids_str = ','.join([pid for pid, _ in all_players])
     all_player_nicknames_str = ','.join([pname for _, pname in all_players])

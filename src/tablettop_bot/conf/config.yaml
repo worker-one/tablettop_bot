@@ -6,7 +6,6 @@ antiflood:
   enabled: true
   time_window_seconds: 2
 apps:
-  - start
   - host_game
   - join_game
   - library

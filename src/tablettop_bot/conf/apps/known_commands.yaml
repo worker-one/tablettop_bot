@@ -4,6 +4,7 @@ app:
     - join_game
     - library
     - about
+    - start
     - online_library
     - create_game
 strings:

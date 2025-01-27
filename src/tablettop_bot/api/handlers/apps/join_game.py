@@ -70,18 +70,17 @@ def format_enrolled_games(enrolled_games, chat_id, user_id):
         if game.use_steam:
             formatted_message += f'Server: {game.server_data}, Password: {game.server_password}\n'
         if game.room:
-            room_link = config.app.room_to_link.get(str(game.room))
+            room_link = config.app.room_to_link.get(game.room)
             if room_link:
-                formatted_message += f'Discord комната: <a href="{room_link}">#{game.discord_telegram_link}</a>\n'
+                formatted_message += f'Discord комната: <a href="{room_link}">#{game.room}</a>\n'
             else:
-                formatted_message += f'Discord комната: #{game.discord_telegram_link}\n\n'
+                formatted_message += f'Discord комната: {game.discord_telegram_link}\n\n'
 
     keyboard = InlineKeyboardMarkup()
     keyboard.add(InlineKeyboardButton("Отписаться от игры", callback_data='select_unsubscribe_game'))
     keyboard.add(InlineKeyboardButton("Удалить игру", callback_data='select_delete_game'))
 
     return formatted_message, keyboard
-
 
 
 class GameState:
@@ -145,7 +144,7 @@ def register_handlers(bot: TeleBot):
 
     logger.info("Registering `join_game` handlers")
 
-    @bot.message_handler(commands=['join_game','start'])
+    @bot.message_handler(commands=['join_game', 'start'])
     def handle_start(message):
         cleanup_past_games()
         crud.prolong()

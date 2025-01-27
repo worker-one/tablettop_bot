@@ -2,10 +2,7 @@ import logging
 
 from omegaconf import OmegaConf
 from telebot import TeleBot
-from telebot.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
-from telebot.util import is_command
 
-from ....db import crud
 
 # Load logging configuration with OmegaConf
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +17,7 @@ def register_handlers(bot: TeleBot):
     """ Register handlers host game app """
 
     logger.info("Registering `known_commands` handlers")
-    @bot.message_handler(func=lambda message: is_command(message.text))
+    @bot.message_handler(func=lambda message: True)
     def handle_known_commands(message):
 
         command_stem = message.text[1:]
