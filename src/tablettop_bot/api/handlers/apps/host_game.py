@@ -86,6 +86,8 @@ def create_date_buttons():
 def register_handlers(bot: TeleBot):
     """ Register handlers host game app """
 
+    game_state = GameState()
+
     logger.info("Registering `host_hame` handlers")
     @bot.message_handler(commands=['host_game'])
     def host_game(message):
@@ -148,8 +150,6 @@ def register_handlers(bot: TeleBot):
             bot.send_message(call.message.chat.id, app_strings.choose_game, reply_markup=create_date_buttons())
         else:
             bot.send_message(call.message.chat.id, app_strings.game_not_found)
-
-    game_state = GameState()
 
     @bot.callback_query_handler(func=lambda call: call.data.startswith('date_'))
     def handle_date_selection(call):
@@ -227,7 +227,6 @@ def register_handlers(bot: TeleBot):
 
 
     def ask_for_server(message):
-        global game_state
         game_state.selected_server = message.text  # Store the entered server information
 
         bot.send_message(message.chat.id, app_strings.enter_password)
@@ -235,7 +234,6 @@ def register_handlers(bot: TeleBot):
 
 
     def handle_password_input(message):
-        global game_state
         password = message.text
         game_state.server_password = password
 

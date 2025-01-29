@@ -75,10 +75,12 @@ def format_enrolled_games(enrolled_games, chat_id, user_id):
                 formatted_message += f'Discord комната: <a href="{room_link}">#{game.room}</a>\n'
             else:
                 formatted_message += f'Discord комната: {game.discord_telegram_link}\n\n'
+        formatted_message += "\n"
 
     keyboard = InlineKeyboardMarkup()
     keyboard.add(InlineKeyboardButton("Отписаться от игры", callback_data='select_unsubscribe_game'))
     keyboard.add(InlineKeyboardButton("Удалить игру", callback_data='select_delete_game'))
+
 
     return formatted_message, keyboard
 
