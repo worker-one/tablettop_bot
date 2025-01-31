@@ -1,5 +1,5 @@
 name: "tablettop_bot"
-version: "0.1.2"
+version: "0.1.3"
 lang: "en"
 timezone: "Europe/Paris"
 antiflood:

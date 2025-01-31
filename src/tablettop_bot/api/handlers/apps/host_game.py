@@ -118,9 +118,9 @@ def register_handlers(bot: TeleBot):
 
         navigation_buttons = []
         if page > 0:
-            navigation_buttons.append(InlineKeyboardButton(app_strings.prev_page, callback_data=f'prev_page_{page - 1}'))
+            navigation_buttons.append(InlineKeyboardButton(app_strings.prev_page, callback_data=f'prev_page_all_games_{page - 1}'))
         if page < total_pages - 1:
-            navigation_buttons.append(InlineKeyboardButton(app_strings.next_page, callback_data=f'next_page_{page + 1}'))
+            navigation_buttons.append(InlineKeyboardButton(app_strings.next_page, callback_data=f'prev_page_all_games_{page + 1}'))
         if navigation_buttons:
             keyboard.row(*navigation_buttons)
 
@@ -129,7 +129,7 @@ def register_handlers(bot: TeleBot):
         else:
             bot.send_message(chat_id, message, reply_markup=keyboard)
 
-    @bot.callback_query_handler(func=lambda call: call.data.startswith('prev_page_') or call.data.startswith('next_page_'))
+    @bot.callback_query_handler(func=lambda call: call.data.startswith('prev_page_all_games_') or call.data.startswith('prev_page_all_games_'))
     def handle_page_navigation(call):
         
         page = int(call.data.split('_')[-1])

@@ -81,11 +81,11 @@ def get_scheduled_games():
 
 def get_online_games():
     db: Session = get_session()
-    return db.query(Game).filter(Game.online == 1).order_by(Game.name).all()
+    return db.query(Game).filter(Game.online == True).order_by(Game.name).all()
 
 def get_offline_games():
     db: Session = get_session()
-    return db.query(Game).filter(Game.online == 0).order_by(Game.name).all()
+    return db.query(Game).filter(Game.online == False).order_by(Game.name).all()
 
 def get_available_room(selected_datetime: datetime):
     db: Session = get_session()
@@ -244,7 +244,6 @@ def synchronize_series_players(game_id: int):
         if g:
             player_ids = g.player_ids.split(',') if g.player_ids else []
             player_nicknames = g.player_nicknames.split(',') if g.player_nicknames else []
-            print(f"all_players: {all_players}")
             for player_id, player_nickname in zip(player_ids, player_nicknames):
                 if (player_id, player_nickname) not in all_players:
                     all_players.append((player_id, player_nickname))
